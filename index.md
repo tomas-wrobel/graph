@@ -46,7 +46,7 @@ new PieChart({
 ## React version
 In React version it doesn't use object, but each Graph contains GraphItem element.
 ### Examples
-```JSX
+{% highlight jsx%}
 var graph = <BarGraph heading="Programming Languages">
 	<GraphItem value={578} name="HTML" />
 	<GraphItem value={1587} name="JavaScript" />
@@ -59,4 +59,4 @@ var chart = <PieChart">
 	<GraphItem value={435} name="Java" color="yellow" />
 	<GraphItem value={198} name="Python" />
 </BarGraph>
-```
+{% endhighlight %}
