@@ -1,0 +1,10 @@
+theme: jekyll-theme-architect
+title: "Graph.js - SVG graphs controlled by JavaScript"
+description: "or its frameworks"
+show_downloads: true
+github:
+  ts_url: "graph.ts"
+  js_url: "graph.js"
+  tsx_url: "graph.tsx"
+  jsx_url: "graph.jsx"
+logo: "logo.png"
