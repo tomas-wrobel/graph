@@ -1,6 +1,6 @@
 theme: jekyll-theme-architect
-title: "Graph.js - SVG graphs controlled by JavaScript"
-description: "or its frameworks"
+title: "Graph.js"
+description: "SVG graphs controlled by JavaScript"
 show_downloads: true
 github:
   ts_url: "graph.ts"
