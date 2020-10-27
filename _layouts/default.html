@@ -37,7 +37,7 @@
           {{ content }}
         </section>
 
-        <aside id="sidebar" style="background: url({{ site.logo }}) no-repeat bottom; background-size: contain;">
+        <aside id="sidebar">
           {% if site.show_downloads %}
             <a href="{{ site.github.ts_url }}" class="button" download>
               <small>Download</small>
@@ -56,10 +56,12 @@
               .jsx file
             </a>
           {% endif %}
-
+          
           {% if site.github.is_project_page %}
             <p class="repo-owner"><a href="{{ site.github.repository_url }}">{{ site.github.repository_name }}</a> is maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a>.</p>
           {% endif %}
+          
+          <div style="background: url({{ site.logo }}) no-repeat bottom; background-size: contain; height: 100%; width: 100%"></div>
         </aside>
       </div>
     </div>
