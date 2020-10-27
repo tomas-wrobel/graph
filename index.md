@@ -43,3 +43,20 @@ new PieChart({
   "#FF0"
 ]).appendTo(document.body);
 ```
+## React version
+In React version it doesn't use object, but each Graph contains GraphItem element.
+### Examples
+``` jsx
+var graph = <BarGraph heading="Programming Languages">
+	<GraphItem value={578} name="HTML" />
+	<GraphItem value={1587} name="JavaScript" />
+	<GraphItem value={435} name="Java" />
+	<GraphItem value={198} name="Python" />
+</BarGraph>
+var chart = <PieChart">
+	<GraphItem value={578} name="HTML" />
+	<GraphItem value={1587} name="JavaScript" color="#0F0" />
+	<GraphItem value={435} name="Java" color="yellow" />
+	<GraphItem value={198} name="Python" />
+</BarGraph>
+```
