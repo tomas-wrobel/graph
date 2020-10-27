@@ -11,7 +11,7 @@ abstract class Graph {
 	public values: number[];
 	public colors: string[];
 	protected total: number;
-	public constructor(data: GraphData = {}, colors: string[] = []) {
+	public constructor(data: GraphData, colors: string[] = []) {
 		this.names = Object.keys(data);
 		this.values = this.names.map(name => data[name]);
 		this.total = this.values.reduce((a, b) => a + b, 0);
@@ -73,19 +73,21 @@ class BarGraph extends Graph {
 			{
 				writingMode: "vertical-rl",
 				textOrientation: "mixed",
-				fontFamily: "Arial"
+				fontFamily: "sans-serif"
 			}
 		));
 		const offsetBottom = 2, offsetTop = 25,
-		max = Math.max(...this.values),
-		yAxisScale = (300 - offsetTop) / max,
+		max = Math.max(...this.values), min = Math.min(...this.values),
+		orderOfMagniture = Number.parseInt("1" + "0".repeat((max - min).toFixed(0).length -1)),
+		maxAxisValue = Math.ceil(max / orderOfMagniture) * orderOfMagniture,
+		yAxisScale = (300 - offsetTop) / (maxAxisValue / orderOfMagniture),
 		xAxisScale = 400 / (this.values.length + 2);
-		for (let axisValue = max, count = 0; axisValue >= 0; axisValue--, count++) {
+		for (let axisValue = maxAxisValue, count = 0; axisValue >= 0; axisValue -= orderOfMagniture, count++) {
 			let axisY = offsetTop - offsetBottom + yAxisScale *  count;
 			paper.appendChild(this.createSVGElement(
-				"text", Math.max(axisValue, 0) + "", {
+				"text", axisValue + "", {
 					x: 30, y: axisY,
-					"font-family": "Arial"
+					"font-family": "sans-serif"
 				}
 			));
 			paper.appendChild(this.createSVGElement(
@@ -97,21 +99,43 @@ class BarGraph extends Graph {
 				} 
 			));
 		}
-		const axisY = this.values.map(value => yAxisScale * value);
+		const axisY = this.values.map(value => yAxisScale * (value / orderOfMagniture));
 		let x = 0;
+		axisY.forEach((y, i) => {
+			if (this.values[i] % orderOfMagniture === 0) return;
+			paper.appendChild(
+				this.createSVGElement(
+					"line", "", {
+						y1: 300 - offsetBottom - y,
+						y2: 300 - offsetBottom - y,
+						x1: 0, x2: 400,
+						"stroke-dasharray": 4,
+						"stroke": "gray",
+						"stroke-width": 0.09
+					}
+				)
+			);
+			paper.appendChild(this.createSVGElement(
+				"text", this.values[i] + "", {
+					x: 30, y: 300 - offsetBottom - y,
+					fill: "gray", "font-size": "50%",
+					"font-family": "sans-serif"
+				}
+			));
+		})
 		axisY.forEach((y, i) => {
 			paper.appendChild(
 				this.createSVGElement(
 					"rect", "", {
 						width: xAxisScale,
-						height: yAxisScale * this.values[i],
+						height: y,
 						x: xAxisScale + i * xAxisScale + x,
 						y: 300 - offsetBottom - y,
 						fill: this.colors[i]
 					}
 				)
 			).innerHTML = `
-				<animate attributeName="height" from="0" to "${yAxisScale * this.values[i]}" dur="1s" />
+				<animate attributeName="height" from="0" to="${y}" dur="1s" />
 				<animate attributeName="y" from="300" to="${300 - offsetBottom - y}" dur="1s" />
 			`;
 			x += 400 / this.values.length / this.values.length;
@@ -124,7 +148,7 @@ class BarGraph extends Graph {
 						"text-anchor": "bottom",
 						x: xAxisScale + i * xAxisScale + x,
 						y: 300 - offsetBottom - y,
-						"font-family": "Arial"
+						"font-family": "sans-serif"
 					}
 				)
 			)

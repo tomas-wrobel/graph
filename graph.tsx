@@ -19,27 +19,40 @@ class BarGraph extends React.Component<{heading: string}> {
 		const offsetBottom = 2, offsetTop = 25,
 		values = React.Children.map(this.props.children, (item: Item) => item.props.value),
 		colors = React.Children.map(this.props.children, (graphItem: Item, i) => graphItem.props.color || `hsl(${i / values.length * 360}, 66%, 50%)`),
-		max = Math.max(...values),
+		max = Math.max(...values), min = Math.min(...values),
 		itemsLength = React.Children.count(this.props.children),
-		yAxisScale = (300 - offsetTop) / max,
+		orderOfMagniture = Number.parseInt("1" + "0".repeat((max - min).toFixed(0).length -1)),
 		xAxisScale = 400 / (itemsLength + 2),
-		yAxis = values.map(v => v * yAxisScale),
-		numberedLines = Array(max).fill(0).map((_zero, i) => {
-			const y = offsetTop - offsetBottom + yAxisScale *  i;
-			return <g key={y}>
-				<line x1={0} x2={400} y1={y} y2={y} stroke="#000" strokeWidth={0.5} />
-				<text x={30} y={y} style={{fontFamily: "sans-serif"}}>{max - i}</text>
-			</g>
-		});
+		maxAxisValue = Math.ceil(max / orderOfMagniture) * orderOfMagniture,
+		yAxisScale = (300 - offsetTop) / (maxAxisValue / orderOfMagniture),
+		yAxis = values.map(v => yAxisScale * (v / orderOfMagniture)),
+		numberedLines = (function (arr) {
+			for (let axisValue = maxAxisValue, count = 0; axisValue >= 0; axisValue -= orderOfMagniture, count++) {
+				let y = offsetTop - offsetBottom + yAxisScale *  count;
+				arr.push(
+					<g key={axisValue}>
+						<line x1={0} x2={400} y1={y} y2={y} stroke="gray" strokeWidth={0.1} />
+						<text x={15} y={y} style={{fontFamily: "sans-serif"}}>{axisValue}</text>
+					</g>
+				);
+			}
+			return arr;
+		})(new Array<JSX.Element>());
 		let x = 0;
 		const rects = React.Children.map(this.props.children, (item: Item, i) => {
-			const {name, value} = item.props;
+			const {name, value} = item.props,
+			y = 300 - offsetBottom - yAxis[i],
+			numberedLine = <g>
+				<line strokeDasharray={4} stroke="gray" strokeWidth={0.09} y1={y} y2={y} x1={0} x2={400} />
+				<text fill="gray" style={{fontFamily: "sans-serif", fontSize: "50%"}} x={15} y={y}>{values[i]}</text>
+			</g>
 			let result = <g key={name}>
-				<rect width={xAxisScale} height={yAxisScale * value} x={xAxisScale + i * xAxisScale + x} y={300 - offsetBottom - yAxis[i]} fill={colors[i]}>
-					<animate attributeName="height" from={0} to={yAxisScale * value} dur="1s" />
-					<animate attributeName="y" from={300} to={300 - offsetBottom - yAxis[i]} dur="1s" />
+				<rect width={xAxisScale} height={yAxis[i]} x={xAxisScale + i * xAxisScale + x} y={y} fill={colors[i]}>
+					<animate attributeName="height" from={0} to={yAxis[i]} dur="1s" />
+					<animate attributeName="y" from={300} to={y} dur="1s" />
 				</rect>
 				<text style={{textAnchor: "start", fontFamily: "sans-serif"}} x={xAxisScale + i * xAxisScale + x} y={300 - offsetBottom - yAxis[i]}>{name}</text>
+				{value % orderOfMagniture != 0 && numberedLine}
 			</g>
 			x += 400 / itemsLength / itemsLength;
 			return result;
@@ -83,19 +96,3 @@ class PieChart extends React.Component {
 		</div>
 	}
 }
-
-ReactDOM.render(
-	<div>
-		<BarGraph heading="Graph">
-			<GraphItem value={5} name="USA" color="#0F0" />
-			<GraphItem value={8} name="Canada" />
-			<GraphItem value={11} name="Russia" />
-		</BarGraph>
-		<PieChart>
-			<GraphItem value={5} name="USA" />
-			<GraphItem value={8} name="Canada" color="#0FF" />
-			<GraphItem value={11} name="Russia" color="#FF0" />
-		</PieChart>
-	</div>,
-	document.body
-);

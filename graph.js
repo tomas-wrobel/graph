@@ -14,7 +14,6 @@ var __extends = (this && this.__extends) || (function () {
 var Graph = /** @class */ (function () {
     function Graph(data, colors) {
         var _this = this;
-        if (data === void 0) { data = {}; }
         if (colors === void 0) { colors = []; }
         this.names = Object.keys(data);
         this.values = this.names.map(function (name) { return data[name]; });
@@ -79,18 +78,18 @@ var BarGraph = /** @class */ (function (_super) {
         });
         paper.appendChild(this.createSVGElement("text", this.axisName, {
             "text-anchor": "middle",
-            x: "8", y: "150",
+            x: "8", y: "150"
         }, {
             writingMode: "vertical-rl",
             textOrientation: "mixed",
-            fontFamily: "Arial"
+            fontFamily: "sans-serif"
         }));
-        var offsetBottom = 2, offsetTop = 25, max = Math.max.apply(Math, this.values), yAxisScale = (300 - offsetTop) / max, xAxisScale = 400 / (this.values.length + 2);
-        for (var axisValue = max, count = 0; axisValue >= 0; axisValue--, count++) {
+        var offsetBottom = 2, offsetTop = 25, max = Math.max.apply(Math, this.values), min = Math.min.apply(Math, this.values), orderOfMagniture = Number.parseInt("1" + "0".repeat((max - min).toFixed(0).length - 1)), maxAxisValue = Math.ceil(max / orderOfMagniture) * orderOfMagniture, yAxisScale = (300 - offsetTop) / (maxAxisValue / orderOfMagniture), xAxisScale = 400 / (this.values.length + 2);
+        for (var axisValue = maxAxisValue, count = 0; axisValue >= 0; axisValue -= orderOfMagniture, count++) {
             var axisY_1 = offsetTop - offsetBottom + yAxisScale * count;
-            paper.appendChild(this.createSVGElement("text", Math.max(axisValue, 0) + "", {
+            paper.appendChild(this.createSVGElement("text", axisValue + "", {
                 x: 30, y: axisY_1,
-                "font-family": "Arial"
+                "font-family": "sans-serif"
             }));
             paper.appendChild(this.createSVGElement("line", "", {
                 x1: 0, y1: axisY_1,
@@ -99,16 +98,33 @@ var BarGraph = /** @class */ (function (_super) {
                 stroke: "black"
             }));
         }
-        var axisY = this.values.map(function (value) { return yAxisScale * value; });
+        var axisY = this.values.map(function (value) { return yAxisScale * (value / orderOfMagniture); });
         var x = 0;
+        axisY.forEach(function (y, i) {
+            if (_this.values[i] % orderOfMagniture === 0)
+                return;
+            paper.appendChild(_this.createSVGElement("line", "", {
+                y1: 300 - offsetBottom - y,
+                y2: 300 - offsetBottom - y,
+                x1: 0, x2: 400,
+                "stroke-dasharray": 4,
+                "stroke": "gray",
+                "stroke-width": 0.09
+            }));
+            paper.appendChild(_this.createSVGElement("text", _this.values[i] + "", {
+                x: 30, y: 300 - offsetBottom - y,
+                fill: "gray", "font-size": "50%",
+                "font-family": "sans-serif"
+            }));
+        });
         axisY.forEach(function (y, i) {
             paper.appendChild(_this.createSVGElement("rect", "", {
                 width: xAxisScale,
-                height: yAxisScale * _this.values[i],
+                height: y,
                 x: xAxisScale + i * xAxisScale + x,
                 y: 300 - offsetBottom - y,
                 fill: _this.colors[i]
-            })).innerHTML = "\n\t\t\t\t<animate attributeName=\"height\" from=\"0\" to \"" + yAxisScale * _this.values[i] + "\" dur=\"1s\" />\n\t\t\t\t<animate attributeName=\"y\" from=\"300\" to=\"" + (300 - offsetBottom - y) + "\" dur=\"1s\" />\n\t\t\t";
+            })).innerHTML = "\n\t\t\t\t<animate attributeName=\"height\" from=\"0\" to=\"" + y + "\" dur=\"1s\" />\n\t\t\t\t<animate attributeName=\"y\" from=\"300\" to=\"" + (300 - offsetBottom - y) + "\" dur=\"1s\" />\n\t\t\t";
             x += 400 / _this.values.length / _this.values.length;
         });
         x = 0;
@@ -117,7 +133,7 @@ var BarGraph = /** @class */ (function (_super) {
                 "text-anchor": "bottom",
                 x: xAxisScale + i * xAxisScale + x,
                 y: 300 - offsetBottom - y,
-                "font-family": "Arial"
+                "font-family": "sans-serif"
             }));
             x += 400 / _this.values.length / _this.values.length;
         });
