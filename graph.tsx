@@ -76,7 +76,7 @@ class PieChart extends React.Component {
 		const total = React.Children.map(this.props.children, (pieItem: Item) => pieItem.props.value).reduce((a, b) => a + b, 0);
 		const colors = React.Children.map(this.props.children, (pieItem: Item, i) => pieItem.props.color || `hsl(${i / React.Children.count(this.props.children) * 360}, 66%, 50%)`);
 		const info = React.Children.map(this.props.children, (pieItem: Item, i) => (
-			<div><span style={{color: colors[i]}}>&#9632;</span> {pieItem.props.name}: {pieItem.props.value} ({Math.round(100 / (total / pieItem.props.value))}%)</div>
+			<div><span style={{color: colors[i]}}>&#9632;</span> {pieItem.props.name}: {pieItem.props.value} ({((pieItem.props.value / total) * 100).toFixed(2)}%)</div>
 		));
 		const arcs = React.Children.map(this.props.children, (pieItem: Item, i) => {
 			startAngle = endAngle;

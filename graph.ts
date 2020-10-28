@@ -3,7 +3,7 @@ type GraphData = {
 };
 
 type Attributes = {
-	[x: string]: string|number;
+	[x: string]: {toString(): string};
 }
 
 abstract class Graph {
@@ -44,7 +44,7 @@ abstract class Graph {
 		return el;
 	}
 	public percents(i: number) {
-		return (100 / (this.total / i)).toFixed(2) + "%";
+		return ((i / this.total) * 100).toFixed(2) + "%";
 	}
 }
 
